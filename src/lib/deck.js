@@ -1,8 +1,8 @@
 export const FIBONACCI_DECK = ['0', '1', '2', '3', '5', '8', '13', '21', '34', '55', '89', '?', '☕']
 
-export function average(votes) {
-  const numeric = Object.values(votes)
-    .map((v) => v.value)
+export function average(participants) {
+  const numeric = Object.values(participants)
+    .map((p) => p.vote)
     .filter((v) => v != null && !Number.isNaN(Number(v)))
     .map(Number)
 

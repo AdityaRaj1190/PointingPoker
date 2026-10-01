@@ -251,10 +251,23 @@ input {
 
 .result {
   text-align: center;
-  font-size: 20px;
+  border: 1px solid var(--accent-border);
+  background: var(--accent-bg);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.result-average {
+  font-size: 24px;
   font-weight: 600;
   color: var(--text-h);
-  margin-bottom: 24px;
+}
+
+.result-detail {
+  font-size: 14px;
+  color: var(--text);
+  margin-top: 4px;
 }
 
 .deck {

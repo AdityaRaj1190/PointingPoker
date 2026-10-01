@@ -116,6 +116,9 @@ export default function Room() {
   const myVote = self ? self.vote : null
   const revealed = Boolean(room.revealed)
   const avg = average(participants)
+  const numericVoteCount = Object.values(participants).filter(
+    (p) => p.vote != null && !Number.isNaN(Number(p.vote)),
+  ).length
   const votedCount = Object.values(participants).filter((p) => p.vote != null).length
 
   function handleCopyLink() {
@@ -157,7 +160,16 @@ export default function Room() {
 
       {revealed && (
         <div className="result">
-          {avg != null ? <p>Average: {avg.toFixed(1)}</p> : <p>No numeric votes yet.</p>}
+          {avg != null ? (
+            <>
+              <p className="result-average">Average: {avg.toFixed(1)}</p>
+              <p className="result-detail">
+                based on {numericVoteCount} numeric vote{numericVoteCount === 1 ? '' : 's'}
+              </p>
+            </>
+          ) : (
+            <p className="result-average">No numeric votes yet.</p>
+          )}
         </div>
       )}
 
