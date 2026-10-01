@@ -80,7 +80,13 @@ Data model in Realtime Database:
 rooms/{roomId}
   topic: string
   revealed: boolean
+  moderatorId: string | null
   participants/{participantId}
     name: string
     vote: string | null
 ```
+
+The first person to join a room becomes its moderator (only they can reveal
+votes and start a new round); the current moderator can hand the role to
+someone else by clicking that person's seat. If the moderator leaves, the
+role is automatically reassigned to whoever's client notices first.

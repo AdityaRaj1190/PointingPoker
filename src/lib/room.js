@@ -6,6 +6,7 @@ import {
   onDisconnect,
   serverTimestamp,
   get,
+  runTransaction,
 } from 'firebase/database'
 import { db } from './firebase'
 
@@ -18,6 +19,7 @@ export async function createRoom(roomId, topic) {
   await set(ref(db, `rooms/${roomId}`), {
     topic: topic || '',
     revealed: false,
+    moderatorId: null,
     createdAt: serverTimestamp(),
     participants: {},
   })
@@ -66,4 +68,14 @@ export async function resetRound(roomId) {
 
 export function setTopic(roomId, topic) {
   return update(ref(db, `rooms/${roomId}`), { topic })
+}
+
+export function claimModeratorIfEmpty(roomId, participantId) {
+  return runTransaction(ref(db, `rooms/${roomId}/moderatorId`), (current) =>
+    current == null ? participantId : current,
+  )
+}
+
+export function setModerator(roomId, participantId) {
+  return update(ref(db, `rooms/${roomId}`), { moderatorId: participantId })
 }

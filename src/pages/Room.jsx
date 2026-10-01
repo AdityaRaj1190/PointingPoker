@@ -9,6 +9,8 @@ import {
   resetRound,
   setTopic,
   roomExists,
+  claimModeratorIfEmpty,
+  setModerator,
 } from '../lib/room'
 import { getParticipantId, getStoredName, setStoredName } from '../lib/identity'
 import { FIBONACCI_DECK, average, nearestCardValue } from '../lib/deck'
@@ -47,6 +49,17 @@ export default function Room() {
       leaveRoom(roomId, participantId)
     }
   }, [roomId, participantId, joined, name])
+
+  useEffect(() => {
+    if (!room) return
+    const participants = room.participants || {}
+    if (!participants[participantId]) return
+    if (room.moderatorId == null) {
+      claimModeratorIfEmpty(roomId, participantId)
+    } else if (!participants[room.moderatorId]) {
+      setModerator(roomId, participantId)
+    }
+  }, [room, roomId, participantId])
 
   const handleJoin = useCallback(
     (e) => {
@@ -115,6 +128,9 @@ export default function Room() {
   const self = participants[participantId]
   const myVote = self ? self.vote : null
   const revealed = Boolean(room.revealed)
+  const moderatorId = room.moderatorId
+  const isModerator = moderatorId === participantId
+  const moderatorName = moderatorId ? participants[moderatorId]?.name : null
   const avg = average(participants)
   const nearestCard = nearestCardValue(avg)
   const numericVoteCount = Object.values(participants).filter(
@@ -157,7 +173,14 @@ export default function Room() {
         <button type="submit">Set topic</button>
       </form>
 
-      <ParticipantsBoard participants={participants} revealed={revealed} selfId={participantId} />
+      <ParticipantsBoard
+        participants={participants}
+        revealed={revealed}
+        selfId={participantId}
+        moderatorId={moderatorId}
+        canAssignModerator={isModerator}
+        onSelectModerator={(id) => setModerator(roomId, id)}
+      />
 
       {revealed && (
         <div className="result">
@@ -188,14 +211,22 @@ export default function Room() {
       </div>
 
       <div className="controls">
-        {revealed ? (
-          <button type="button" onClick={() => resetRound(roomId)}>
-            New round
-          </button>
+        {isModerator ? (
+          revealed ? (
+            <button type="button" onClick={() => resetRound(roomId)}>
+              New round
+            </button>
+          ) : (
+            <button type="button" onClick={() => setRevealed(roomId, true)}>
+              Reveal votes
+            </button>
+          )
         ) : (
-          <button type="button" onClick={() => setRevealed(roomId, true)}>
-            Reveal votes
-          </button>
+          <p className="moderator-note">
+            {revealed ? 'Waiting for ' : 'Only '}
+            <strong>{moderatorName || 'the moderator'}</strong>
+            {revealed ? ' to start a new round.' : ' can reveal votes.'}
+          </p>
         )}
       </div>
     </div>
