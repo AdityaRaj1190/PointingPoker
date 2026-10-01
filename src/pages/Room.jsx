@@ -23,7 +23,7 @@ export default function Room() {
   const navigate = useNavigate()
   const participantId = getParticipantId()
   const [name, setName] = useState(getStoredName())
-  const [joined, setJoined] = useState(Boolean(getStoredName()))
+  const [joined, setJoined] = useState(Boolean(getStoredName().trim()))
   const [room, setRoom] = useState(null)
   const [notFound, setNotFound] = useState(false)
   const [topicDraft, setTopicDraft] = useState('')
@@ -41,8 +41,8 @@ export default function Room() {
   }, [roomId])
 
   useEffect(() => {
-    if (!firebaseConfigured || !joined) return undefined
-    joinRoom(roomId, participantId, name)
+    if (!firebaseConfigured || !joined || !name.trim()) return undefined
+    joinRoom(roomId, participantId, name.trim())
     const unsubscribe = subscribeToRoom(roomId, setRoom)
     return () => {
       unsubscribe()
@@ -130,7 +130,7 @@ export default function Room() {
   const revealed = Boolean(room.revealed)
   const moderatorId = room.moderatorId
   const isModerator = moderatorId === participantId
-  const moderatorName = moderatorId ? participants[moderatorId]?.name : null
+  const moderatorName = moderatorId ? participants[moderatorId]?.name?.trim() || 'Anonymous' : null
   const avg = average(participants)
   const nearestCard = nearestCardValue(avg)
   const numericVoteCount = Object.values(participants).filter(

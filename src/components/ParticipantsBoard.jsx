@@ -17,6 +17,7 @@ export default function ParticipantsBoard({
       {entries.map(([id, p]) => {
         const hasVoted = p.vote != null
         const isModerator = id === moderatorId
+        const displayName = p.name?.trim() || 'Anonymous'
         const seat = (
           <>
             <div className={`board-card${hasVoted ? ' voted' : ''}`}>
@@ -24,7 +25,7 @@ export default function ParticipantsBoard({
             </div>
             <span className="board-name">
               {isModerator ? '👑 ' : ''}
-              {p.name}
+              {displayName}
               {id === selfId ? ' (you)' : ''}
             </span>
           </>
@@ -36,7 +37,9 @@ export default function ParticipantsBoard({
                 type="button"
                 className={`board-seat-button${isModerator ? ' is-moderator' : ''}`}
                 onClick={() => onSelectModerator(id)}
-                title={isModerator ? `${p.name} can reveal votes` : `Make ${p.name} the moderator`}
+                title={
+                  isModerator ? `${displayName} can reveal votes` : `Make ${displayName} the moderator`
+                }
               >
                 {seat}
               </button>
