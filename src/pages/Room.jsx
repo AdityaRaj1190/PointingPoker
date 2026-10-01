@@ -11,7 +11,7 @@ import {
   roomExists,
 } from '../lib/room'
 import { getParticipantId, getStoredName, setStoredName } from '../lib/identity'
-import { FIBONACCI_DECK, average } from '../lib/deck'
+import { FIBONACCI_DECK, average, nearestCardValue } from '../lib/deck'
 import { firebaseConfigured } from '../lib/firebase'
 import Card from '../components/Card'
 import ParticipantsBoard from '../components/ParticipantsBoard'
@@ -116,6 +116,7 @@ export default function Room() {
   const myVote = self ? self.vote : null
   const revealed = Boolean(room.revealed)
   const avg = average(participants)
+  const nearestCard = nearestCardValue(avg)
   const numericVoteCount = Object.values(participants).filter(
     (p) => p.vote != null && !Number.isNaN(Number(p.vote)),
   ).length
@@ -162,9 +163,10 @@ export default function Room() {
         <div className="result">
           {avg != null ? (
             <>
-              <p className="result-average">Average: {avg.toFixed(1)}</p>
+              <p className="result-average">Suggested estimate: {nearestCard}</p>
               <p className="result-detail">
-                based on {numericVoteCount} numeric vote{numericVoteCount === 1 ? '' : 's'}
+                average {avg.toFixed(1)} across {numericVoteCount} numeric vote
+                {numericVoteCount === 1 ? '' : 's'}
               </p>
             </>
           ) : (
