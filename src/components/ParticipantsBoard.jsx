@@ -1,11 +1,4 @@
-export default function ParticipantsBoard({
-  participants,
-  revealed,
-  selfId,
-  moderatorId,
-  canAssignModerator,
-  onSelectModerator,
-}) {
+export default function ParticipantsBoard({ participants, revealed, selfId }) {
   const entries = Object.entries(participants)
 
   if (entries.length === 0) {
@@ -16,36 +9,16 @@ export default function ParticipantsBoard({
     <ul className="board">
       {entries.map(([id, p]) => {
         const hasVoted = p.vote != null
-        const isModerator = id === moderatorId
         const displayName = p.name?.trim() || 'Anonymous'
-        const seat = (
-          <>
+        return (
+          <li key={id} className={`board-seat${id === selfId ? ' self' : ''}`}>
             <div className={`board-card${hasVoted ? ' voted' : ''}`}>
               {revealed ? (hasVoted ? p.vote : '—') : hasVoted ? '✓' : ''}
             </div>
             <span className="board-name">
-              {isModerator ? '👑 ' : ''}
               {displayName}
               {id === selfId ? ' (you)' : ''}
             </span>
-          </>
-        )
-        return (
-          <li key={id} className={`board-seat${id === selfId ? ' self' : ''}`}>
-            {canAssignModerator ? (
-              <button
-                type="button"
-                className={`board-seat-button${isModerator ? ' is-moderator' : ''}`}
-                onClick={() => onSelectModerator(id)}
-                title={
-                  isModerator ? `${displayName} can reveal votes` : `Make ${displayName} the moderator`
-                }
-              >
-                {seat}
-              </button>
-            ) : (
-              seat
-            )}
           </li>
         )
       })}
